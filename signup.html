@@ -1,0 +1,101 @@
+<html>
+	<head>
+		<meta charset='utf-8'>
+		<title>Create Account</title>
+		<script src="/lib/js-cookie.js"   type="text/javascript"></script>
+		<style>
+			body{
+				background-color:#1e1f2b;
+				text-align:center;
+				font-size:1.2em;
+			}
+
+			h1{
+				color:#96c9e0;
+			}
+
+			textarea{
+				background-color:#96c9e0;
+				width:250px;
+				height:300px;
+			}
+
+			#checkbox{
+				font-size:0.5em
+			}
+
+			label{
+				color:#96c9e0;
+			}
+
+			input{
+				width:25%;
+				height:25px;
+				background-color:#96c9e0;
+				border:none;
+				margin-bottom:10px;
+				border-radius:6px;
+			}
+			button{
+				background-color:#96c9e0;
+				text-color:black;
+				border:2px outset #96c9e0;
+				border-radius:4px;
+				transition-duration: 0.4s;
+			}
+			
+			button:hover{
+				box-shadow: 0 8px 16px 0 rgba(255,255,255,0.2), 0 6px 20px 0 rgba(255,255,255,0.19);
+			}
+		</style>
+	</head>
+	<body>
+		<div class='center'>
+			<H1>Make an account</H1>
+			<form action="/createAccount" method='POST'>
+				<div>
+					<label for="username">Username</label>
+					<input id="username" name="username" type="text" autocomplete="username" required />
+				</div>
+				<div>
+					<label for="current-password">Password</label>
+					<input id="current-password" name="password" type="password" autocomplete="current-password" required />
+				</div>
+				<div>
+					<label for="email">Email</label>
+					<input id="email" name="email" type="email" autocomplete="email" required />
+				</div>
+				<div>
+					<textarea>
+							I, by communicating over this tool, agree to the following terms and conditions:
+							I will not post any violent or otherwise disrusptive content.
+							I will not post content that is sexual in nature.
+							I will serve as a slave under Josiah forever.
+							I will eat 2 oranges every day, such that I will not contract scurvy and die.
+							I understand that by using this tool, I may lose my sanity, trying to get the stupid UI to work
+							If I have read this far, the slavery clause above no longer applies.
+
+					</textarea><br>
+					<div>
+						<label for="checkbox" id='checkbox'>I agree with this statement</label><br>
+						<input type="checkbox" value='I agree to the above terms and conditions' name='checkbox'>
+						
+					<div>
+				</div>
+				<div>
+					<button type="submit">Create Account</button>
+				</div>
+				<a href="/login.html">login to my account</a>
+			</form>
+		</div>
+		<script>
+			var form = document.querySelector('form')
+			/*
+			form.onSubmit =function(e){
+				e.preventDefault()
+				e.submit()
+			}
+			*/
+		</script>
+	</body>
+</html>

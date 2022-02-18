@@ -1,0 +1,20 @@
+{
+  "files": {
+    "data.txt": [
+      {
+        "id": "07b8ab72-674d-4dce-b68f-bdc58158602a",
+        "line": 1,
+        "version": 40,
+        "index": 0
+      }
+    ],
+    "lib/js.cookie.min.js": [
+      {
+        "id": "dc828e94-ab2b-43ca-b0fc-b6905fd5e496",
+        "line": 2,
+        "version": 1,
+        "index": 30
+      }
+    ]
+  }
+}
