@@ -1,11 +1,12 @@
 
-const path = require('path')
-const bodyParser = require('body-parser');
-const express = require("express");
-const fs = require('fs')
-const { v4: uuidv4 } = require('uuid');
 
-const app = new express();
+import path from 'path';
+import bodyParser from "body-parser"
+import { Express } from 'express';
+import fs from 'node:fs'
+import {v4 as uuidv4} from "uuid"
+
+const app = new Express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
