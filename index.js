@@ -1,10 +1,13 @@
 
 
 import path from 'path';
+import { fileURLToPath } from 'url';
 import bodyParser from "body-parser"
-import { Express } from 'express';
-import fs from 'node:fs'
+import  Express  from 'express';
+import fs from 'node:fs/promises'
 import {v4 as uuidv4} from "uuid"
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = new Express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -16,27 +19,19 @@ const restrictedUrls = ['/users.json']
 
 //initialize the json file that contains the messages
 
-function reset(){
-	fs.writeFile(path.join(__dirname,'/data.json'), JSON.stringify( {"arr":[]} ), err => {
-			if (err) {console.error(err) }
-	})
+async function reset(){
+	await fs.writeFile(path.join(__dirname,'/data.json'), JSON.stringify( {"arr":[]} ))
 }
 
 
-function logPost(message){
-	fs.readFile(path.join(__dirname,'/data.json'), 'utf8' , (err, data) => {
-		if (err) {console.error(err) }
-		
+async function logPost(message){
+	let data = await fs.readFile(path.join(__dirname,'/data.json'), 'utf8' )
+
 
 		var tempData = JSON.parse(data);
 		tempData.arr.push(JSON.parse(message) )
 
-		
-		fs.writeFile(path.join(__dirname,'/data.json'), JSON.stringify(tempData ), err => {
-				if (err) {console.error(err)  }
-
-				})
-	})
+		await fs.writeFile(path.join(__dirname,'/data.json'), JSON.stringify(tempData ))
 
 }
 
@@ -77,75 +72,66 @@ app.post("/", function(req, res) {
 	
 });
 
-app.post('/login',function(req,res){
+app.post('/login', async (req,res) =>{
 	console.log(req.body)
-	fs.readFile(__dirname+'/users.json', 'utf8' , (err, data) => {
-		if (err) {
-			console.error(err)
-			return
-		}
+	let data = await fs.readFile(__dirname+'/users.json', 'utf8' )
 		
-		for(i of JSON.parse(data)){
-			if(i.username === req.body.username){
-				if(i.password === req.body.password){
-					res.redirect('/home/'+i.uuid+'/'+i.username)
-					//send webpage
-				}else{
-					res.set('Content-Type', 'text/html')
-					res.send('<p>incorrect password</p>')
-				}
+	for(i of JSON.parse(data)){
+		if(i.username === req.body.username){
+			if(i.password === req.body.password){
+				res.redirect('/home/'+i.uuid+'/'+i.username)
+				//send webpage
 			}else{
 				res.set('Content-Type', 'text/html')
-				res.send('<p>username not found</p>')
+				res.send('<p>incorrect password</p>')
 			}
+		}else{
+			res.set('Content-Type', 'text/html')
+			res.send('<p>username not found</p>')
 		}
-	})
+	}
+	
 })
 
 var matchFound
 var content
-app.post('/createAccount',function(req,res){
+app.post('/createAccount',async (req,res)=>{
 	console.log(req.body)
-	fs.readFile(__dirname+'/users.json', 'utf8' , (err, data) => {
-		if (err) {
-			console.error(err)
-			return
-		}
-		matchFound=false
-		if('checkbox' in req.body){
+	let data = fs.readFile(__dirname+'/users.json', 'utf8' )
 
-			for( i of JSON.parse(data)){
-				if(i.username == req.body.username){
-					res.set('Content-Type', 'text/html')
-					res.send('<p>username taken</p>')
-					matchFound=true
-				}
-			}
-			if(!matchFound){
-				content = JSON.parse(data)
-				content.push({"username":req.body.username,
-				"password":req.body.password,
-				"email":req.body.email,
-				"uuid":uuidv4()})
-				fs.writeFile(__dirname+'/users.json', JSON.stringify(content), err => {
-					if (err) {
-						console.error(err)
-						return
-					}
-					res.redirect('index.html?name='+req.body.username)
-				})
-			}
-		}else{
-			res.set('Content-Type', 'text/html')
-			res.send('<p>Check the dang box you little crap</p>')
-		}
 
-		
-	})
+	matchFound=false
+	if('checkbox' in req.body){
+
+		for( i of JSON.parse(data)){
+			if(i.username == req.body.username){
+				res.set('Content-Type', 'text/html')
+				res.send('<p>username taken</p>')
+				matchFound=true
+			}
+		}
+		if(!matchFound){
+			content = JSON.parse(data)
+			content.push({"username":req.body.username,
+			"password":req.body.password,
+			"email":req.body.email,
+			"uuid":uuidv4()})
+			await fs.writeFile(__dirname+'/users.json', JSON.stringify(content))
+			.then(()=>{
+				res.redirect('index.html?name='+req.body.username)
+			})
+				
+		}
+	}else{
+		res.set('Content-Type', 'text/html')
+		res.send('<p>Check the dang box you little crap</p>')
+	}
+
+
 })
 
 
 
-app.listen(port, function(){
+app.listen(port, ()=>{
   console.log("server is running on port 3000");
 })
