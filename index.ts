@@ -4,10 +4,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import bodyParser from "body-parser"
 import  Express  from 'express';
-import {v4 as uuidv4} from "uuid"
 import {Client} from '@replit/database';
-import https from 'https'
-
+import http from 'http'
+import sockjs, {createServer, Server} from "sockjs"
+import { Message } from './src/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = new Client(process.env.DBURL)
 const port = 3000
-const server = https.createServer(app)
+
 
 
 function reset(){
@@ -45,21 +45,6 @@ app.get("*",(req,res) => {
 	res.sendFile(__dirname +'/src'+ req.originalUrl)
 })
 
-app.post("/", function(req, res) {
-	console.log('post request recived')
-
-	var tempMs = JSON.parse( req.body.message)
-	console.log(' message sent : ',tempMs.text)
-
-		if(tempMs.text == 'reset'){
-			reset();
-			return;
-		};
-		
-		logPost(req.body.message)
-		res.end("recived")
-});
-
 app.post('/login', async (req,res) =>{
 	console.log(req.body)
 	let data:any = await db.get("users")
@@ -80,7 +65,6 @@ app.post('/login', async (req,res) =>{
 	}
 	
 })
-
 
 app.post('/createAccount',async (req,res)=>{
 	let matchFound:boolean
@@ -119,9 +103,40 @@ app.post('/createAccount',async (req,res)=>{
 
 })
 
+function uuidv4() {
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+		return v.toString(16);
+	});
+}
+	
+let socketArr:sockjs.Connection[] = []
 
+
+const wss = sockjs.createServer({ prefix:'/echo'});
+wss.on('connection', async function(ws) {
+	socketArr.push(ws)
+	ws.write( JSON.stringify( await db.get("messages")))
+
+	ws.on('data', async function(message) {
+		console.log("data recived")
+		let data:Message[] = <Message[]>await db.get("messages")
+		data.push(JSON.parse(message))
+		db.set("message",data)
+
+		for(let i of socketArr){
+			i.write(JSON.stringify(data));
+		}
+	});
+
+  	ws.on('close', function() {
+		socketArr.splice(socketArr.findIndex( (v,i)=>(v.id == ws.id) ),1)
+	});
+});
+
+const server = http.createServer(app)
+wss.installHandlers(server, {prefix:'/echo'});
 server.listen(port, ()=>{
   console.log("server is running on port 3000");
 })
-
 

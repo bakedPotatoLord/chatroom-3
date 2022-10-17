@@ -1,5 +1,8 @@
 import Cookies from './lib/js-cookie.js'
 
+
+
+
 console.log('documentReady')
 
 let name  = <HTMLInputElement>document.getElementById('name')
@@ -13,6 +16,23 @@ let logout = document.getElementById('logout')
 uuid.innerHTML ="Hello " +Cookies.get('username')
 
 
+
+//@ts-ignore
+var sock = new SockJS('/echo',"",{sessionId:8});
+sock.onopen = function() {
+    console.log('open');
+    
+    sock.send(JSON.stringify(new Message("me","you","yo")));
+};
+
+sock.onmessage = function(e) {
+    console.log('message', e.data);
+    //sock.close();
+};
+
+sock.onclose = function() {
+    console.log('close');
+};
 
 
 window.onload=function(){
