@@ -29,6 +29,7 @@ function displayMessages(messageArr: Message[]){
 form.onsubmit = (e)=>{
     e.preventDefault()
     let data = new FormData(form)
+    tInput.value = ''
 
     sock.send(JSON.stringify(new Message(data.get('name'),data.get('recip'),data.get('tInput'))))
 }
