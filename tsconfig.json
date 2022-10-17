@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "watch":true,
+    "target": "ESNext",
+    "lib": ["DOM","ESNext"],
+    "allowSyntheticDefaultImports": true,
+    "module": "esnext",
+  },
+  "include": ["./*.ts"],
+  "exclude":["node_modules"]
+
+}
