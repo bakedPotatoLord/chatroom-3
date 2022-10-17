@@ -23,10 +23,6 @@ app.get("/home/:uuid/:username",(req,res) => {
 	res.sendFile(__dirname+'/index.html')
 })
 
-app.get('/data.json',async (req,res)=>{
-	res.send(await db.get("messages"))
-})
-
 app.get("*",(req,res) => {
 	res.sendFile(__dirname +'/src'+ req.originalUrl)
 })
@@ -37,15 +33,18 @@ app.post('/login', async (req,res) =>{
 	for(let i of data){
 		if(i.username === req.body.username){
 			if(i.password === req.body.password){
-				res.redirect('/home/'+i.uuid+'/'+i.username)
-				//send webpage
+				res.cookie("username",req.body.username)
+				res.redirect('/')
+				break
 			}else{
 				res.set('Content-Type', 'text/html')
 				res.send('<p>incorrect password</p>')
+				break
 			}
 		}else{
 			res.set('Content-Type', 'text/html')
 			res.send('<p>username not found</p>')
+			break
 		}
 	}
 })
