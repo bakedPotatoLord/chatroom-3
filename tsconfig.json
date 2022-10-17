@@ -5,6 +5,7 @@
     "lib": ["DOM","ESNext"],
     "allowSyntheticDefaultImports": true,
     "module": "esnext",
+    "moduleResolution": "NodeNext"
   },
   "include": ["./*.ts"],
   "exclude":["node_modules"]
