@@ -40,8 +40,6 @@ sock.onopen = function() {
     console.log('open');
 };
 
-//setTimeout(()=>{)); },1000)
-
 sock.onmessage = function(e) {
     displayMessages(JSON.parse(e.data))
 };
@@ -61,7 +59,11 @@ window.onload=function(){
     uuid.innerHTML ="Hello " +Cookies.get('username')
 }
 
-
+tInput.onkeyup = (e)=>{
+    if(e.key == 'enter'){
+        form.submit()
+    }
+}
 
 
 logout.onclick = function(e){
