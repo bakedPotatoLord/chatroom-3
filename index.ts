@@ -4,13 +4,17 @@ import bodyParser from "body-parser"
 import  Express  from 'express';
 import fs from 'node:fs/promises'
 import {v4 as uuidv4} from "uuid"
+import {Client} from '@replit/database';
+import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config()
+
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = Express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
+const db = new Client(process.env.DBURL)
 const port = 3000;
 
 //initialize the json file that contains the messages
