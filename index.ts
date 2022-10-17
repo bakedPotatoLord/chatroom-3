@@ -6,7 +6,7 @@ import bodyParser from "body-parser"
 import  Express  from 'express';
 import {Client} from '@replit/database';
 import http from 'http'
-import sockjs, {createServer, Server} from "sockjs"
+import sockjs from "sockjs"
 import { Message } from './src/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -16,19 +16,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = new Client(process.env.DBURL)
 const port = 3000
-
-
-
-function reset(){
-	db.set("messages",[])
-}
-
-
-async function logPost(message){
-	let data:any= await db.get("messages")
-	data.push(JSON.parse(message) )
-	db.set("messages", data)
-}
 
 app.get("/home/:uuid/:username",(req,res) => {
 	res.cookie('uuid',req.params.uuid,{ maxAge: 900000, httpOnly: false})
@@ -40,7 +27,6 @@ app.get('/data.json',async (req,res)=>{
 	res.send(await db.get("messages"))
 })
 
-
 app.get("*",(req,res) => {
 	res.sendFile(__dirname +'/src'+ req.originalUrl)
 })
@@ -48,7 +34,6 @@ app.get("*",(req,res) => {
 app.post('/login', async (req,res) =>{
 	console.log(req.body)
 	let data:any = await db.get("users")
-		
 	for(let i of data){
 		if(i.username === req.body.username){
 			if(i.password === req.body.password){
@@ -63,7 +48,6 @@ app.post('/login', async (req,res) =>{
 			res.send('<p>username not found</p>')
 		}
 	}
-	
 })
 
 app.post('/createAccount',async (req,res)=>{
@@ -71,11 +55,8 @@ app.post('/createAccount',async (req,res)=>{
 	let content
 	console.log(req.body)
 	let data:any = await db.get("users")
-
-
 	matchFound=false
 	if('checkbox' in req.body){
-
 		for(let i of data){
 			if(i.username == req.body.username){
 				res.set('Content-Type', 'text/html')
@@ -92,15 +73,11 @@ app.post('/createAccount',async (req,res)=>{
 			await db.set("users",content)
 			res.cookie("username",req.body.username)
 			res.redirect('/')
-			
-				
 		}
 	}else{
 		res.set('Content-Type', 'text/html')
 		res.send('<p>Check the dang box you little crap</p>')
 	}
-
-
 })
 
 function uuidv4() {
@@ -111,18 +88,18 @@ function uuidv4() {
 }
 	
 let socketArr:sockjs.Connection[] = []
-
-
 const wss = sockjs.createServer({ prefix:'/echo'});
 wss.on('connection', async function(ws) {
 	socketArr.push(ws)
 	ws.write( JSON.stringify( await db.get("messages")))
 
 	ws.on('data', async function(message) {
+		if(JSON.parse(message).text == 'reset'){
+			db.set("messages",[])
+		}
 		let data:Message[] = <Message[]>await db.get("messages")
 		data.push(JSON.parse(message))
 		db.set("messages",data)
-
 		for(let i of socketArr){
 			i.write(JSON.stringify(data));
 		}
@@ -136,6 +113,6 @@ wss.on('connection', async function(ws) {
 const server = http.createServer(app)
 wss.installHandlers(server, {prefix:'/echo'});
 server.listen(port, ()=>{
-  console.log("server is running on port 3000");
+  console.log(`server is running on port ${port}`);
 })
 
