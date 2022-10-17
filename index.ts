@@ -65,26 +65,16 @@ app.post('/createAccount',async (req,res)=>{
 		}
 		if(!matchFound){
 			content = data
-			content.push({"username":req.body.username,
-			"password":req.body.password,
-			"email":req.body.email,
-			"uuid":uuidv4()})
-			await db.set("users",content)
+			content.push(new User(req.body.username,req.body.password,req.body.email))
+			db.set("users",content)
 			res.cookie("username",req.body.username)
 			res.redirect('/')
 		}
 	}else{
 		res.set('Content-Type', 'text/html')
-		res.send('<p>Check the dang box you little crap</p>')
+		res.send('<p>Check the box please</p>')
 	}
 })
-
-function uuidv4() {
-	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-		var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-		return v.toString(16);
-	});
-}
 	
 let socketArr:sockjs.Connection[] = []
 const wss = sockjs.createServer({ prefix:'/echo'});
@@ -116,3 +106,23 @@ server.listen(port, ()=>{
   console.log(`server is running on port ${port}`);
 })
 
+
+class User{
+	username: string;
+	password: string;
+	email: string;
+	uuid: string;
+    constructor(username,password,email){
+		this.username = username
+		this.password= password
+		this.email = email
+		this.uuid = this.uuidv4()
+	}
+
+	uuidv4() {
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+			var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+			return v.toString(16);
+		});
+	}
+}
