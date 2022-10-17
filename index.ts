@@ -1,4 +1,4 @@
-import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+import * as dotenv from 'dotenv'
 dotenv.config()
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -6,6 +6,7 @@ import bodyParser from "body-parser"
 import  Express  from 'express';
 import {v4 as uuidv4} from "uuid"
 import {Client} from '@replit/database';
+import https from 'https'
 
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,10 +15,11 @@ const app = Express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const db = new Client(process.env.DBURL)
-const port = 3000;
+const port = 3000
+const server = https.createServer(app)
 
 
-async function reset(){
+function reset(){
 	db.set("messages",[])
 }
 
@@ -118,8 +120,7 @@ app.post('/createAccount',async (req,res)=>{
 })
 
 
-
-app.listen(port, ()=>{
+server.listen(port, ()=>{
   console.log("server is running on port 3000");
 })
 
