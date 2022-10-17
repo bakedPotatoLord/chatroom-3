@@ -1,21 +1,11 @@
 import Cookies from './lib/js-cookie.js'
 
-
-
-
-console.log('documentReady')
-
 let name  = <HTMLInputElement>document.getElementById('name')
-let recip =<HTMLInputElement> document.getElementById('recip')
 let tInput = <HTMLInputElement>document.getElementById('tInput')
 let textarea =  <HTMLTextAreaElement>document.getElementById('tArea')
 let uuid = document.getElementById('uuid')
 let logout = document.getElementById('logout')
 let form = document.forms[0]
-
-
-
-
 
 function displayMessages(messageArr: Message[]){
     console.log(messageArr)
@@ -30,10 +20,8 @@ form.onsubmit = (e)=>{
     e.preventDefault()
     let data = new FormData(form)
     tInput.value = ''
-
     sock.send(JSON.stringify(new Message(data.get('name'),data.get('recip'),data.get('tInput'))))
 }
-
 
 //@ts-ignore
 var sock = new SockJS('/echo',"",{sessionId:8});
@@ -49,13 +37,11 @@ sock.onclose = function() {
     console.log('sock closed');
 };
 
-
 window.onload=function(){
     if(Cookies.get('uuid') == undefined){
         Cookies.set('uuid','guest')
         Cookies.set('username','guest')
     }
-
     name.value = Cookies.get('username')
     uuid.innerHTML ="Hello " +Cookies.get('username')
 }
@@ -65,7 +51,6 @@ tInput.onkeyup = (e)=>{
         form.submit()
     }
 }
-
 
 logout.onclick = function(e){
     if(confirm("Want to log out?")){
