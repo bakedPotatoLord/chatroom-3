@@ -94,12 +94,13 @@ wss.on('connection', async function(ws) {
 	ws.write( JSON.stringify( await db.get("messages")))
 
 	ws.on('data', async function(message) {
-		if(JSON.parse(message).text == 'reset'){
-			db.set("messages",[])
-		}
 		let data:Message[] = <Message[]>await db.get("messages")
 		data.push(JSON.parse(message))
 		db.set("messages",data)
+		if(JSON.parse(message).text == 'reset'){
+			db.set("messages",[])
+			data = []
+		}
 		for(let i of socketArr){
 			i.write(JSON.stringify(data));
 		}
