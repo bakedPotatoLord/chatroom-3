@@ -2,3 +2,5 @@
 node_modules
 *.js
 !src/lib/*.js
+!src/lib/*/*.js
+!src/lib/*/*/*.js
