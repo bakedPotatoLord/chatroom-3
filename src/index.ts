@@ -1,5 +1,5 @@
-import Cookies from '../node_modules/js-cookie/index.js'
-import {Message} from '../index.js'
+import Cookies from './lib/js-cookie.js'
+
 console.log('documentReady')
 
 let name  = <HTMLInputElement>document.getElementById('name')
@@ -11,7 +11,6 @@ let logout = document.getElementById('logout')
 
 
 uuid.innerHTML ="Hello " +Cookies.get('username')
-
 
 
 
@@ -35,4 +34,17 @@ logout.onclick = function(e){
         Cookies.set('uuid','guest')
         Cookies.set('username','guest')
     }
+}
+
+export class Message{
+	sender: string;
+	recip: string;
+	text: string;
+	timestamp: number;
+	constructor(sender, recip, text){
+		this.sender = sender;
+		this.recip = recip;
+		this.text = text;
+		this.timestamp = Date.now();
+	}
 }

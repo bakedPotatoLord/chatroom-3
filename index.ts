@@ -123,15 +123,4 @@ app.listen(port, ()=>{
   console.log("server is running on port 3000");
 })
 
-export class Message{
-	sender: string;
-	recip: string;
-	text: string;
-	timestamp: number;
-	constructor(sender, recip, text){
-		this.sender = sender;
-		this.recip = recip;
-		this.text = text;
-		this.timestamp = Date.now();
-	}
-}
+
