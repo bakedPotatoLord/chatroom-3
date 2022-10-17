@@ -17,45 +17,32 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const db = new Client(process.env.DBURL)
 const port = 3000;
 
-//initialize the json file that contains the messages
 
 async function reset(){
-	await fs.writeFile(path.join(__dirname,'/data.json'), JSON.stringify( {"arr":[]} ))
+	db.set("messages",[])
 }
 
 
 async function logPost(message){
-	let data = await fs.readFile(path.join(__dirname,'/data.json'), 'utf8' )
-
-
-		var tempData = JSON.parse(data);
-		tempData.arr.push(JSON.parse(message) )
-
-		await fs.writeFile(path.join(__dirname,'/data.json'), JSON.stringify(tempData ))
-
+	let data:any= await db.get("messages")
+	data.push(JSON.parse(message) )
+	db.set("messages", data)
 }
 
 app.get("/home/:uuid/:username",(req,res) => {
-
 	res.cookie('uuid',req.params.uuid,{ maxAge: 900000, httpOnly: false})
 	res.cookie('username',req.params.username,{ maxAge: 900000, httpOnly: false})
-	
 	res.sendFile(__dirname+'/index.html')
-
 })
 
-app.get('/data.json',(req,res)=>{
-	res.sendFile(__dirname + req.originalUrl)
+app.get('/data.json',async (req,res)=>{
+	res.send(await db.get("messages"))
 })
 
 
 app.get("*",(req,res) => {
-
 	res.sendFile(__dirname +'/src'+ req.originalUrl)
-
 })
-
-
 
 app.post("/", function(req, res) {
 	console.log('post request recived')
@@ -69,8 +56,7 @@ app.post("/", function(req, res) {
 		};
 		
 		logPost(req.body.message)
-
-	
+		res.end("recived")
 });
 
 app.post('/login', async (req,res) =>{
