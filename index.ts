@@ -1,5 +1,3 @@
-
-
 import path from 'path';
 import { fileURLToPath } from 'url';
 import bodyParser from "body-parser"
@@ -9,7 +7,7 @@ import {v4 as uuidv4} from "uuid"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const app = new Express();
+const app = Express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
@@ -76,7 +74,7 @@ app.post('/login', async (req,res) =>{
 	console.log(req.body)
 	let data = await fs.readFile(__dirname+'/users.json', 'utf8' )
 		
-	for(i of JSON.parse(data)){
+	for(let i of JSON.parse(data)){
 		if(i.username === req.body.username){
 			if(i.password === req.body.password){
 				res.redirect('/home/'+i.uuid+'/'+i.username)
@@ -97,13 +95,13 @@ var matchFound
 var content
 app.post('/createAccount',async (req,res)=>{
 	console.log(req.body)
-	let data = fs.readFile(__dirname+'/users.json', 'utf8' )
+	let data = await fs.readFile(__dirname+'/users.json', 'utf8' )
 
 
 	matchFound=false
 	if('checkbox' in req.body){
 
-		for( i of JSON.parse(data)){
+		for(let i of JSON.parse(data)){
 			if(i.username == req.body.username){
 				res.set('Content-Type', 'text/html')
 				res.send('<p>username taken</p>')
