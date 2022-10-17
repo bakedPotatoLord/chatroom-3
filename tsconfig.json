@@ -7,7 +7,7 @@
     "module": "esnext",
     "moduleResolution": "NodeNext"
   },
-  "include": ["./*.ts"],
+  "include": ["./*.ts","src/*.ts"],
   "exclude":["node_modules"]
 
 }
