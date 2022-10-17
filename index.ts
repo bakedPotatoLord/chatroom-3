@@ -1,12 +1,11 @@
+import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config()
 import path from 'path';
 import { fileURLToPath } from 'url';
 import bodyParser from "body-parser"
 import  Express  from 'express';
-import fs from 'node:fs/promises'
 import {v4 as uuidv4} from "uuid"
 import {Client} from '@replit/database';
-import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
-dotenv.config()
 
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -61,9 +60,9 @@ app.post("/", function(req, res) {
 
 app.post('/login', async (req,res) =>{
 	console.log(req.body)
-	let data = await fs.readFile(__dirname+'/users.json', 'utf8' )
+	let data:any = await db.get("users")
 		
-	for(let i of JSON.parse(data)){
+	for(let i of data){
 		if(i.username === req.body.username){
 			if(i.password === req.body.password){
 				res.redirect('/home/'+i.uuid+'/'+i.username)
@@ -80,17 +79,18 @@ app.post('/login', async (req,res) =>{
 	
 })
 
-var matchFound
-var content
+
 app.post('/createAccount',async (req,res)=>{
+	let matchFound:boolean
+	let content
 	console.log(req.body)
-	let data = await fs.readFile(__dirname+'/users.json', 'utf8' )
+	let data:any = await db.get("users")
 
 
 	matchFound=false
 	if('checkbox' in req.body){
 
-		for(let i of JSON.parse(data)){
+		for(let i of data){
 			if(i.username == req.body.username){
 				res.set('Content-Type', 'text/html')
 				res.send('<p>username taken</p>')
@@ -98,15 +98,15 @@ app.post('/createAccount',async (req,res)=>{
 			}
 		}
 		if(!matchFound){
-			content = JSON.parse(data)
+			content = data
 			content.push({"username":req.body.username,
 			"password":req.body.password,
 			"email":req.body.email,
 			"uuid":uuidv4()})
-			await fs.writeFile(__dirname+'/users.json', JSON.stringify(content))
-			.then(()=>{
-				res.redirect('index.html?name='+req.body.username)
-			})
+			await db.set("users",content)
+			res.cookie("username",req.body.username)
+			res.redirect('/')
+			
 				
 		}
 	}else{
