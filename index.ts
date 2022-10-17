@@ -13,8 +13,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const port = 3000;
 
-const restrictedUrls = ['/users.json']
-
 //initialize the json file that contains the messages
 
 async function reset(){
@@ -42,16 +40,17 @@ app.get("/home/:uuid/:username",(req,res) => {
 
 })
 
+app.get('/data.json',(req,res)=>{
+	res.sendFile(__dirname + req.originalUrl)
+})
+
 
 app.get("*",(req,res) => {
-	if(!restrictedUrls.includes(req.originalUrl) ){
 
-		res.sendFile(__dirname + req.originalUrl)
-	}else{
-		res.send('restricted file')
-	}
+	res.sendFile(__dirname +'/src'+ req.originalUrl)
 
 })
+
 
 
 app.post("/", function(req, res) {
