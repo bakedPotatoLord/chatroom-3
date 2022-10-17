@@ -11,9 +11,10 @@ let tInput = <HTMLInputElement>document.getElementById('tInput')
 let textarea =  <HTMLTextAreaElement>document.getElementById('tArea')
 let uuid = document.getElementById('uuid')
 let logout = document.getElementById('logout')
+let form = document.forms[0]
 
 
-uuid.innerHTML ="Hello " +Cookies.get('username')
+
 
 
 function displayMessages(messageArr: Message[]){
@@ -25,6 +26,13 @@ function displayMessages(messageArr: Message[]){
     textarea.value = displayText
 }
 
+form.onsubmit = (e)=>{
+    e.preventDefault()
+    let data = new FormData(form)
+
+    sock.send(JSON.stringify(new Message(data.get('name'),data.get('recip'),data.get('tInput'))))
+}
+
 
 //@ts-ignore
 var sock = new SockJS('/echo',"",{sessionId:8});
@@ -32,29 +40,27 @@ sock.onopen = function() {
     console.log('open');
 };
 
-//setTimeout(()=>{sock.send(JSON.stringify(new Message("me","you","yo"))); },1000)
+//setTimeout(()=>{)); },1000)
 
 sock.onmessage = function(e) {
     displayMessages(JSON.parse(e.data))
-    //sock.close();
 };
 
 sock.onclose = function() {
-    console.log('close');
+    console.log('sock closed');
 };
 
 
 window.onload=function(){
-    name.value = Cookies.get('name')
-    uuid.innerHTML = Cookies.get('username')
-
     if(Cookies.get('uuid') == undefined){
         Cookies.set('uuid','guest')
         Cookies.set('username','guest')
     }
 
-
+    name.value = Cookies.get('username')
+    uuid.innerHTML ="Hello " +Cookies.get('username')
 }
+
 
 
 
